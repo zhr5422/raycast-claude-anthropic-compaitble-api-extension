@@ -1,6 +1,6 @@
 import { Action, ActionPanel, Form, Icon, useNavigation } from "@raycast/api";
 import { useState } from "react";
-import { DEFAULT_MODEL } from "../../hooks/useModel";
+import { DEFAULT_MODEL_ID } from "../../model-config";
 import { QuestionFormProps } from "../../type";
 
 export const QuestionForm = ({
@@ -18,7 +18,7 @@ export const QuestionForm = ({
   });
 
   const separateDefaultModel = models.filter((x) => x.id !== "default");
-  const defaultModel = models.find((x) => x.id === "default") ?? DEFAULT_MODEL;
+  const defaultModel = models.find((x) => x.id === DEFAULT_MODEL_ID);
 
   return (
     <Form

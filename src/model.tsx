@@ -2,7 +2,8 @@ import { Action, ActionPanel, Icon, List, useNavigation } from "@raycast/api";
 import { useState } from "react";
 import { DestructiveAction, PinAction } from "./actions";
 import { PreferencesActionSection } from "./actions/preferences";
-import { DEFAULT_MODEL, useModel } from "./hooks/useModel";
+import { useModel } from "./hooks/useModel";
+import { DEFAULT_MODEL_ID } from "./model-config";
 import { Model } from "./type";
 import { ModelForm } from "./views/model/form";
 import { ModelListItem, ModelListView } from "./views/model/list";
@@ -67,9 +68,9 @@ export default function Model() {
       );
     });
 
-  const defaultModelOnly = filteredModels.find((x) => x.id === DEFAULT_MODEL.id) ?? DEFAULT_MODEL;
+  const defaultModelOnly = filteredModels.find((x) => x.id === DEFAULT_MODEL_ID) ?? models.defaultModel;
 
-  const customModelsOnly = filteredModels.filter((x) => x.id !== DEFAULT_MODEL.id);
+  const customModelsOnly = filteredModels.filter((x) => x.id !== DEFAULT_MODEL_ID);
 
   return (
     <List
