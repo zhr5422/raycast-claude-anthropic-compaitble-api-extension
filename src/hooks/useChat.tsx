@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Chat, ChatHook, Model } from "../type";
 import { chatTransformer } from "../utils";
+import { extractTextContent } from "../utils/content";
 import { useAnthropic } from "./useAnthropic";
 import { useHistory } from "./useHistory";
 import { MessageStream } from "@anthropic-ai/sdk/lib/MessageStream";
@@ -140,7 +141,7 @@ export function useChat<T extends Chat>(props: T[]): ChatHook {
         })
         .then(async (res) => {
           if ("content" in res) {
-            chat = { ...chat, answer: res.content[0].text };
+            chat = { ...chat, answer: extractTextContent(res.content) };
           }
 
           toast.title = "Got your answer!";
