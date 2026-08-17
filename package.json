@@ -73,6 +73,19 @@
       "required": true
     },
     {
+      "name": "authenticationType",
+      "label": "Authentication Type",
+      "description": "Choose how the compatible service authenticates requests",
+      "type": "dropdown",
+      "title": "Authentication Type",
+      "default": "api-key",
+      "required": true,
+      "data": [
+        { "title": "X-API-Key", "value": "api-key" },
+        { "title": "Bearer Token", "value": "bearer" }
+      ]
+    },
+    {
       "name": "apiKey",
       "label": "Compatible API Key",
       "description": "Enter the API key for your compatible service",
