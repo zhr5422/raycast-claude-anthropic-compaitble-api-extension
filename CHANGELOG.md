@@ -1,5 +1,12 @@
 # Claude Changelog
 
+## [Anthropic-compatible API support] - 2026-08-17
+
+- Feature: Added required API Base URL, API Key, and Default Model preferences.
+- Feature: Preserved non-streaming requests, SSE streaming, conversations, history, saved answers, and selected-text loading for compatible services.
+- Feature: Custom model identifiers can be entered directly without querying Anthropic's hosted models endpoint.
+- Test: Added local JSON and SSE compatibility tests that do not contact an external API.
+
 ## [Fix memory leak] - 2026-02-01
 
 - Fix: Resolved JS heap out of memory error by throttling UI updates during streaming responses
