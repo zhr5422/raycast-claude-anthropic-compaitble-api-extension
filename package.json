@@ -65,11 +65,27 @@
   ],
   "preferences": [
     {
+      "name": "apiBaseUrl",
+      "label": "Compatible API Base URL",
+      "description": "Enter the service URL prefix before /v1/messages",
+      "type": "textfield",
+      "title": "API Base URL",
+      "required": true
+    },
+    {
       "name": "apiKey",
-      "label": "Anthropic API Key",
-      "description": "Enter your personal Anthropic API Key",
+      "label": "Compatible API Key",
+      "description": "Enter the API key for your compatible service",
       "type": "password",
       "title": "API Key",
+      "required": true
+    },
+    {
+      "name": "defaultModel",
+      "label": "Default Model ID",
+      "description": "Enter the model identifier supported by your compatible service",
+      "type": "textfield",
+      "title": "Default Model",
       "required": true
     },
     {
@@ -118,14 +134,16 @@
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "prettier": "^2.8.8",
-    "typescript": "^4.4.3"
+    "typescript": "^4.4.3",
+    "vitest": "^2.1.9"
   },
   "scripts": {
     "build": "ray build -e dist",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",
-    "publish": "ray publish"
+    "publish": "ray publish",
+    "test": "vitest run"
   },
   "platforms": [
     "macOS"
