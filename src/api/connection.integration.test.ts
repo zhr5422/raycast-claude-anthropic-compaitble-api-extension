@@ -141,7 +141,11 @@ describe("Anthropic-compatible Messages API", () => {
 
   it("sends non-streaming Bearer requests to the configured service", async () => {
     await withEnvironmentVariable("ANTHROPIC_API_KEY", "ambient-key", async () => {
-      const client = createAnthropicClient({ apiBaseUrl: baseURL, apiKey: "local-secret", authenticationType: "bearer" });
+      const client = createAnthropicClient({
+        apiBaseUrl: baseURL,
+        apiKey: "local-secret",
+        authenticationType: "bearer",
+      });
       await client.messages.create({
         model: "vendor/test-model",
         max_tokens: 16,

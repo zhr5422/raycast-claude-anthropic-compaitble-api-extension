@@ -25,7 +25,7 @@ it("uses X-API-Key authentication when selected", () => {
       apiBaseUrl: "https://self-hosted.example/",
       apiKey: "private-key",
       authenticationType: "api-key",
-    }),
+    })
   ).toEqual({ baseURL: "https://self-hosted.example", apiKey: "private-key", authToken: null });
 });
 
@@ -35,6 +35,6 @@ it("uses Bearer authentication when selected", () => {
       apiBaseUrl: "https://self-hosted.example/",
       apiKey: "private-key",
       authenticationType: "bearer",
-    }),
+    })
   ).toEqual({ baseURL: "https://self-hosted.example", apiKey: null, authToken: "private-key" });
 });
