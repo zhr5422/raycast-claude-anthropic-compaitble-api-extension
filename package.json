@@ -118,7 +118,7 @@
   ],
   "dependencies": {
     "@anthropic-ai/sdk": "^0.18.0",
-    "@raycast/api": "^1.78.0",
+    "@raycast/api": "^1.104.23",
     "@raycast/utils": "^1.14.1",
     "@types/uuid": "^9.0.0",
     "cross-fetch": "^4.0.0",
