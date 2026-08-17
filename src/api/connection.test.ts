@@ -11,9 +11,30 @@ describe("normalizeApiBaseUrl", () => {
   });
 });
 
-it("builds SDK options only from the configured endpoint and key", () => {
+it("uses X-API-Key authentication by default", () => {
   expect(buildAnthropicOptions({ apiBaseUrl: "https://self-hosted.example/", apiKey: "private-key" })).toEqual({
     baseURL: "https://self-hosted.example",
     apiKey: "private-key",
+    authToken: null,
   });
+});
+
+it("uses X-API-Key authentication when selected", () => {
+  expect(
+    buildAnthropicOptions({
+      apiBaseUrl: "https://self-hosted.example/",
+      apiKey: "private-key",
+      authenticationType: "api-key",
+    }),
+  ).toEqual({ baseURL: "https://self-hosted.example", apiKey: "private-key", authToken: null });
+});
+
+it("uses Bearer authentication when selected", () => {
+  expect(
+    buildAnthropicOptions({
+      apiBaseUrl: "https://self-hosted.example/",
+      apiKey: "private-key",
+      authenticationType: "bearer",
+    }),
+  ).toEqual({ baseURL: "https://self-hosted.example", apiKey: null, authToken: "private-key" });
 });

@@ -53,6 +53,21 @@ const streamEvents = [
   ["message_stop", { type: "message_stop" }],
 ] as const;
 
+async function withEnvironmentVariable<T>(name: string, value: string, operation: () => Promise<T>): Promise<T> {
+  const originalValue = process.env[name];
+  process.env[name] = value;
+
+  try {
+    return await operation();
+  } finally {
+    if (originalValue === undefined) {
+      delete process.env[name];
+    } else {
+      process.env[name] = originalValue;
+    }
+  }
+}
+
 describe("Anthropic-compatible Messages API", () => {
   let server: Server;
   let baseURL: string;
@@ -103,22 +118,40 @@ describe("Anthropic-compatible Messages API", () => {
   });
 
   it("sends non-streaming requests to the configured service", async () => {
-    const client = createAnthropicClient({ apiBaseUrl: baseURL, apiKey: "local-secret" });
-    const message = await client.messages.create({
-      model: "vendor/test-model",
-      max_tokens: 16,
-      messages: [{ role: "user", content: "hello" }],
-    });
+    await withEnvironmentVariable("ANTHROPIC_AUTH_TOKEN", "ambient-token", async () => {
+      const client = createAnthropicClient({ apiBaseUrl: baseURL, apiKey: "local-secret" });
+      const message = await client.messages.create({
+        model: "vendor/test-model",
+        max_tokens: 16,
+        messages: [{ role: "user", content: "hello" }],
+      });
 
-    expect(capturedRequests).toHaveLength(1);
-    expect(capturedRequests[0]).toMatchObject({
-      method: "POST",
-      url: "/gateway/v1/messages",
-      headers: { "x-api-key": "local-secret" },
-      body: { model: "vendor/test-model" },
+      expect(capturedRequests).toHaveLength(1);
+      expect(capturedRequests[0].headers).not.toHaveProperty("authorization");
+      expect(capturedRequests[0]).toMatchObject({
+        method: "POST",
+        url: "/gateway/v1/messages",
+        headers: { "x-api-key": "local-secret" },
+        body: { model: "vendor/test-model" },
+      });
+      expect(capturedRequests[0].body).not.toHaveProperty("stream");
+      expect(message.content[0]).toEqual({ type: "text", text: "non-stream reply" });
     });
-    expect(capturedRequests[0].body).not.toHaveProperty("stream");
-    expect(message.content[0]).toEqual({ type: "text", text: "non-stream reply" });
+  });
+
+  it("sends non-streaming Bearer requests to the configured service", async () => {
+    await withEnvironmentVariable("ANTHROPIC_API_KEY", "ambient-key", async () => {
+      const client = createAnthropicClient({ apiBaseUrl: baseURL, apiKey: "local-secret", authenticationType: "bearer" });
+      await client.messages.create({
+        model: "vendor/test-model",
+        max_tokens: 16,
+        messages: [{ role: "user", content: "hello" }],
+      });
+
+      expect(capturedRequests).toHaveLength(1);
+      expect(capturedRequests[0].headers.authorization).toBe("Bearer local-secret");
+      expect(capturedRequests[0].headers).not.toHaveProperty("x-api-key");
+    });
   });
 
   it("assembles Anthropic-compatible SSE text events", async () => {
@@ -138,12 +171,35 @@ describe("Anthropic-compatible Messages API", () => {
     });
 
     expect(capturedRequests).toHaveLength(1);
+    expect(capturedRequests[0].headers).not.toHaveProperty("authorization");
     expect(capturedRequests[0]).toMatchObject({
       method: "POST",
       url: "/gateway/v1/messages",
       headers: { "x-api-key": "local-secret" },
       body: { model: "vendor/test-model", stream: true },
     });
+    expect(textChunks.join("")).toBe("stream reply");
+  });
+
+  it("assembles Anthropic-compatible SSE text events with Bearer authentication", async () => {
+    const client = createAnthropicClient({ apiBaseUrl: baseURL, apiKey: "local-secret", authenticationType: "bearer" });
+    const textChunks: string[] = [];
+    const stream = client.messages.stream({
+      model: "vendor/test-model",
+      max_tokens: 16,
+      messages: [{ role: "user", content: "hello" }],
+    });
+
+    await new Promise<void>((resolve, reject) => {
+      stream
+        .on("text", (text) => textChunks.push(text))
+        .on("end", resolve)
+        .on("error", reject);
+    });
+
+    expect(capturedRequests).toHaveLength(1);
+    expect(capturedRequests[0].headers.authorization).toBe("Bearer local-secret");
+    expect(capturedRequests[0].headers).not.toHaveProperty("x-api-key");
     expect(textChunks.join("")).toBe("stream reply");
   });
 });
